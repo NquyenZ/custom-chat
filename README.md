@@ -22,4 +22,4 @@ exports['custom-chat']:SetPlayerChatBubble(target, msg, color, range, duration)
 If you are using QBCore just go into your server.cfg and set "set resources_useSystemChat" to false and unensured the original chat. Then just add this "ensure custom-chat"
 
 ## Preview
-![preview](https://cdn.discordapp.com/attachments/1300094726179000491/1413301927621558443/Screenshot_2025-09-05_060439.png?ex=68bb6f7d&is=68ba1dfd&hm=ee09a7f20fc0ed91c3d10b2f1109ed3fb4782848128de368d0ec273f0903694e&)
+![preview](https://cdn.discordapp.com/attachments/1300094726179000491/1413301927621558443/Screenshot_2025-09-05_060439.png?ex=68d281bd&is=68d1303d&hm=3ec4ced750c27fdff30f6fbbc1972740ae0b6e87fa5edccf291aee6ee0f8ed6f&)
