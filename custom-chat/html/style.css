@@ -1,0 +1,136 @@
+@font-face
+{
+    font-family: "RobotoCondensedBold";
+    src: url("fonts/RobotoCondensed-Bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+
+body
+{
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    font-family: "RobotoCondensedBold", Arial, sans-serif;
+    font-size: 20px;
+    color: #ffffff;
+}
+
+#chat
+{
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 800px;
+    max-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    pointer-events: none;
+}
+
+#chat-messages
+{
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: hidden; 
+    max-height: 400px;
+    flex: 1;
+    padding: 5px;
+    font-size: 18px;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    pointer-events: none;
+}
+
+#chat-messages.active
+{
+    overflow-y: auto;
+    pointer-events: auto;
+}
+
+#chat-messages::-webkit-scrollbar
+{
+    width: 6px;
+}
+
+#chat-messages::-webkit-scrollbar-thumb
+{
+    background: rgba(255,255,255,0.3);
+    border-radius: 10px;
+}
+
+#chat-messages::-webkit-scrollbar-thumb:hover
+{
+    background: rgba(255,255,255,0.5);
+}
+
+#chat-suggestions::-webkit-scrollbar
+{
+    width: 6px;
+}
+
+#chat-suggestions::-webkit-scrollbar-thumb
+{
+    background: rgba(255,255,255,0.3);
+    border-radius: 5px;
+}
+
+#chat-suggestions::-webkit-scrollbar-track
+{
+    background: rgba(0,0,0,0.2);
+}
+
+.chat-message
+{
+    color: white;
+    text-shadow: 1px 1px 0 black, -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black;
+    font-size: inherit;
+}
+
+#chat-input
+{
+    position: absolute;
+    left: 20px;
+    top: 330px;
+    width: 600px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 3px;
+    padding: 8px 10px;
+    color: white;
+    font-size: 18px;
+    outline: none;
+    display: none;
+}
+
+#chat-suggestions
+{
+    position: absolute;
+    left: 20px;
+    top: 370px;
+    width: 600px;
+    max-height: 200px;
+    background: rgba(0,0,0,0);
+    color: white;
+    font-size: 18px;
+    border-radius: 3px;
+    display: none;
+    padding: 5px;
+    overflow-y: auto;
+}
+
+#chat-suggestions div
+{
+    padding: 4px 6px;
+    cursor: pointer;
+    background: rgba(0,0,0,0.5);
+    border-radius: 3px;
+    margin-bottom: 2px;
+}
+
+#chat-suggestions div:hover
+{
+    background: rgba(255,255,255,0.2);
+}
