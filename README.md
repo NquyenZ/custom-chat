@@ -1,7 +1,7 @@
 # custom-chat
 Chat for FiveM with some roleplay command such as /b /me /me /clear /ame or /pm
 
-# Optional Requirement
+## Optional Requirement
 [dvn-typing](https://github.com/devindevelopments/dvn-typing) - For Typing Indicator
 
 But if you don't want to use this just go to 'custom-chat/client.lua:16' and 'custom-chat/client.lua:62' and delete these lines 
