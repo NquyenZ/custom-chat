@@ -4,9 +4,11 @@ function SendClientMessage(target, msg)
     TriggerClientEvent('custom-chat:addMessage', target, msg)
 end
 
-function SetPlayerChatBubble(target, text, color, range, duration)
-    TriggerClientEvent('custom-chat:showBubble', target, text, color, range, duration)
-end
+RegisterNetEvent('custom-chat:showBubble', function(text, color, range, time)
+    local src = source
+
+    TriggerClientEvent('custom-chat:showBubble', -1, src, text, color, range, time)
+end)
 
 local function GetPlayersInRange(src, range)
     local players = {}
@@ -120,12 +122,18 @@ RegisterCommand('ame', function(source, args)
     local fullname = Player.PlayerData.charinfo.firstname .. " " .. Player.PlayerData.charinfo.lastname
     local text = string.format("* %s", msg)
 
-    SetPlayerChatBubble(source, text, { r = 194, g = 162, b = 218, a = 255 }, 15.0, 7000)
+    TriggerClientEvent('custom-chat:showBubble', -1, source, text,
+    {
+        r = 194,
+        g = 162,
+        b = 218,
+        a = 255
+    }, 15.0, 4000)
 end)
 
 RegisterCommand('pm', function(source, args)
     if not Config.EnablePM then
-        SendClientMessage(source, "{AA3333}PM hiện đang bị tắt")
+        SendClientMessage(source, "{FFFFFF}PM hiện {FF6347}đang bị tắt")
         return
     end
 
@@ -150,7 +158,7 @@ RegisterCommand('pm', function(source, args)
     end
 
     if target == source and not Config.PMSelf then
-        SendClientMessage(source, "{AA3333}Bạn không thể PM chính mình")
+        SendClientMessage(source, "{FFFFFF}Bạn {FF6347}không thể{FFFFFF} PM chính mình")
         return
     end
 
@@ -194,6 +202,6 @@ RegisterCommand("pmconfig", function(source, args, rawCommand)
 
         TriggerClientEvent('custom-chat:addMessage', -1, "{F5DEB3}[PM Config]{FFFFFF} PM chính bản thân đã được " .. (value and "{33AA33}Bật" or "{AA3333}Tắt"))
     else
-        SendClientMessage(source, "{FF6347}[Error]{FFFFFF} Tùy chọn không hợp lệ [Chỉ có thể chọn enable/self]")
+        SendClientMessage(source, "{FF6347}[Error]{FFFFFF} Tùy chọn không hợp lệ [Chỉ có thể chọn Enable/Self]")
     end
 end, false)

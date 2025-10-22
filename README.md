@@ -1,6 +1,16 @@
 # custom-chat
 Chat for FiveM with some roleplay command such as /b /me /me /clear /ame or /pm
 
+# Optional Requirement
+[dvn-typing](https://github.com/devindevelopments/dvn-typing) - For Typing Indicator
+
+But if you don't want to use this just go to 'custom-chat/client.lua:16' and 'custom-chat/client.lua:62' and delete these lines 
+
+```
+TriggerEvent("dvn-typing:input", true)
+TriggerEvent("dvn-typing:input", false)
+```
+
 ## Features
 ```
 /b - Local OOC Chat
@@ -15,11 +25,11 @@ Chat for FiveM with some roleplay command such as /b /me /me /clear /ame or /pm
 ## Exports 
 ```
 exports['custom-chat']:SendClientMessage(target, msg)
-exports['custom-chat']:SetPlayerChatBubble(target, msg, color, range, duration)
+TriggerServerEvent('custom-chat:showBubble', target, msg, color, range, duration)
 ```
 
 ## Install
-If you are using QBCore just go into your server.cfg and set "set resources_useSystemChat" to false and unensured the original chat. Then just add this "ensure custom-chat"
+Just go into your server.cfg and set "set resources_useSystemChat" to false and unensured the original chat. Then just add this "ensure custom-chat"
 
 ## Preview
-![preview](https://cdn.discordapp.com/attachments/1300094726179000491/1413301927621558443/Screenshot_2025-09-05_060439.png?ex=68d281bd&is=68d1303d&hm=3ec4ced750c27fdff30f6fbbc1972740ae0b6e87fa5edccf291aee6ee0f8ed6f&)
+![preview](https://cdn.discordapp.com/attachments/1300094726179000491/1413301927621558443/Screenshot_2025-09-05_060439.png?ex=68fa0ebd&is=68f8bd3d&hm=3ff9f8441fa88d7d590fc8ac626fcb194501f6e7f9055a58f0e8d850f2327a19&)

@@ -1,6 +1,7 @@
 let chatInput = document.getElementById('chat-input');
 let chatMessages = document.getElementById('chat-messages');
 let chatSuggestions = document.getElementById('chat-suggestions');
+let chatBubbles = document.getElementById("chat-bubbles");
 
 let commandHistory = [];
 let historyIndex = 0;
@@ -103,6 +104,111 @@ window.addEventListener('message', (event) =>
         {
             chatSuggestions.style.display = 'none';
         }
+    }
+
+    if(data.action === "showChatBubble")
+    {
+        const id = `bubble-${data.serverId}`;
+        let bubble = document.getElementById(id);
+
+        if(!bubble)
+        {
+            bubble = document.createElement("div");
+            bubble.classList.add("chat-bubble");
+            bubble.id = id;
+            bubble.dataset.serverId = data.serverId;
+
+            chatBubbles.appendChild(bubble);
+        }
+
+        let msg = data.text
+            .replace(/{([0-9A-Fa-f]{6})}/g, (_, color) => `<span style="color:#${color}">`)
+            .replace(/{end}/g, "</span>");
+
+        bubble.innerHTML = msg;
+
+        if(data.color)
+        {
+            const a = (typeof data.color.a === 'number') ? (data.color.a / 255) : 1;
+
+            bubble.style.color = `rgba(${data.color.r}, ${data.color.g}, ${data.color.b}, ${a})`;
+        }
+        else
+        {
+            bubble.style.color = "";
+        }
+
+        const updatePosition = () =>
+        {
+            const x = (data.screen && typeof data.screen.x === 'number') ? data.screen.x : 0.5;
+            const y = (data.screen && typeof data.screen.y === 'number') ? data.screen.y : 0.5;
+
+            bubble.style.left = `${x * 100}%`;
+            bubble.style.top = `${y * 100}%`;
+        };
+
+        updatePosition();
+
+        bubble.style.opacity = 1;
+
+        if(bubble._removeTimeout)
+        {
+            clearTimeout(bubble._removeTimeout);
+        }
+
+        bubble._removeTimeout = setTimeout(() =>
+        {
+            bubble.classList.add('fade-out');
+            bubble._removeTimeout2 = setTimeout(() =>
+            {
+                if(bubble && bubble.parentElement)
+                {
+                    bubble.parentElement.removeChild(bubble);
+                }
+            }, 300);
+        }, data.time || 5000);
+    }
+
+    if(event.data.action === "removeChatBubble")
+    {
+        const serverId = event.data.serverId;
+        const bubble = document.getElementById(`bubble-${serverId}`);
+
+        if(bubble)
+        {
+            if(bubble._removeTimeout)
+            {
+                clearTimeout(bubble._removeTimeout);
+                
+                bubble._removeTimeout = null;
+            }
+
+            if(bubble._removeTimeout2)
+            {
+                clearTimeout(bubble._removeTimeout2);
+                bubble._removeTimeout2 = null;
+            }
+
+            bubble.classList.add('fade-out');
+
+            setTimeout(() =>
+            {
+                if(bubble && bubble.parentElement)
+                {
+                    bubble.parentElement.removeChild(bubble);
+                }
+            }, 300);
+        }
+    }
+
+    if(data.action === "hideChatMessages")
+    {
+        document.getElementById('chat-messages').style.display = "none";
+    }
+
+    if(data.action === "showChatMessages")
+    {
+        document.getElementById('chat-messages').style.display = "flex";
     }
 });
 

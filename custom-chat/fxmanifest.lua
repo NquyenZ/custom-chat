@@ -2,15 +2,18 @@ fx_version 'cerulean'
 game 'gta5'
 
 author 'nquyenZ'
-description 'FiveM chat with some roleplay command'
-version '1.0.1'
+description 'FiveM Chat'
+version '1.0.2'
 
 shared_scripts
 {
     'config.lua'
 }
 
-ui_page 'html/index.html'
+ui_page
+{
+    'html/index.html'
+}
 
 files
 {
@@ -33,5 +36,4 @@ server_scripts
 exports
 {
     'SendClientMessage',
-    'SetPlayerChatBubble'
 }

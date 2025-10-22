@@ -2,19 +2,28 @@ local QBCore = exports['qb-core']:GetCoreObject()
 local chatActive = false
 local commandHistory = {}
 local historyIndex = 0
+local displayText = nil
+local displayTime = 0
 
 RegisterCommand('toggleChat', function()
     if chatActive then
         return
     end
 
-    chatActive = true
+    if not IsPauseMenuActive() then
+        chatActive = true
 
-    TriggerEvent("dvn-typing:input", true)
+        TriggerEvent("dvn-typing:input", true)
 
-    SetNuiFocus(true, true)
+        SetNuiFocus(true, true)
 
-    SendNUIMessage({action='enableInput'})
+        SendNUIMessage(
+        {
+            action = 'enableInput'
+        })
+    else
+        print("[nquyenZ Chat] Cannot Open Chat Box While In Pause Menu")
+    end
 end)
 
 RegisterKeyMapping('toggleChat', 'Mo Chat Box', 'keyboard', 'T')
@@ -76,7 +85,11 @@ RegisterNUICallback('getSuggestions', function(data, cb)
         end
     end
 
-    SendNUIMessage({action='updateSuggestions', suggestions=suggestions})
+    SendNUIMessage(
+    {
+        action = 'updateSuggestions',
+        suggestions = suggestions
+    })
 
     cb('ok')
 end)
@@ -88,7 +101,11 @@ RegisterNUICallback('sendMessage', function(data, cb)
 
     SetNuiFocus(false, false)
     
-    SendNUIMessage({action='disableInput', clear=true})
+    SendNUIMessage(
+    {
+        action = 'disableInput',
+        clear = true
+    })
     
     cb('ok')
 end)
@@ -105,107 +122,117 @@ function SendClientMessage(msg)
     TriggerEvent('custom-chat:addMessage', msg)
 end
 
-local bubbles = {}
+local playerBubbles = {}
 
-RegisterNetEvent('custom-chat:showBubble', function(text, color, range, duration)
-    local src = source
-    local ped = GetPlayerPed(GetPlayerFromServerId(src))
-
-    if not ped or ped == 0 then
+RegisterNetEvent('custom-chat:showBubble', function(playerSrc, text, color, range, duration)
+    local playerId = GetPlayerFromServerId(playerSrc)
+    
+    if playerId == -1 then
         return
     end
 
-    local bubble =
+    SetPlayerChatBubble(playerId, text, color, range, duration)
+end)
+
+function SetPlayerChatBubble(playerId, text, color, range, duration)
+    local ped = GetPlayerPed(playerId)
+
+    if not DoesEntityExist(ped) then
+        return
+    end
+
+    local bubbleId = GetPlayerServerId(playerId)
+    local endTime = GetGameTimer() + (duration or 5000)
+    local range = range or 15.0
+    local color = color or
     {
-        ped = ped,
-        text = text,
-        color = color or {r = 255, g = 255, b = 255, a = 255},
-        range = range or 15.0,
-        expire = GetGameTimer() + (duration or 5000)
+        r = 255,
+        g = 255,
+        b = 255, 
+        a = 255
     }
 
-    table.insert(bubbles, bubble)
-end)
-
-function SetPlayerChatBubble(ped, text, color, range, duration)
-    duration = duration or 7000
-
-    local found = false
-
-    for i, bubble in ipairs(bubbles) do
-        if bubble.ped == ped then
-            bubble.text = text
-            bubble.color = color
-            bubble.range = range or 15.0
-            bubble.expire = GetGameTimer() + duration
-
-            found = true
-            break
-        end
-    end
-
-    if not found then
-        table.insert(bubbles,
+    if playerBubbles[bubbleId] then
+        SendNUIMessage(
         {
-            ped = ped,
-            text = text,
-            color = color or { r = 255, g = 255, b = 255, a = 255 },
-            range = range or 15.0,
-            expire = GetGameTimer() + duration
+            action = "removeChatBubble",
+            serverId = bubbleId
         })
+        playerBubbles[bubbleId] = nil
     end
-end
 
-CreateThread(function()
-    while true do
-        Wait(0)
+    playerBubbles[bubbleId] = true
 
-        local playerPed = PlayerPedId()
-        local playerCoords = GetEntityCoords(playerPed)
+    CreateThread(function()
+        while GetGameTimer() < endTime and playerBubbles[bubbleId] do
+            local myPed = PlayerPedId()
+            local myCoords = GetEntityCoords(myPed)
+            local pedCoords = GetPedBoneCoords(ped, 0x796E)
 
-        for i = #bubbles, 1, -1 do
-            local bubble = bubbles[i]
+            myCoords = vector3(myCoords.x, myCoords.y, myCoords.z)
+            pedCoords = vector3(pedCoords.x, pedCoords.y, pedCoords.z)
 
-            if GetGameTimer() > bubble.expire then
-                table.remove(bubbles, i)
-            else
-                local headBone = GetPedBoneIndex(bubble.ped, 0x796E) -- SKEL_Head
-                local pedCoords = GetWorldPositionOfEntityBone(bubble.ped, headBone)
-                local dist = #(playerCoords - pedCoords)
+            local dist = #(myCoords - pedCoords)
 
-                if dist <= tonumber(bubble.range) then
-                    DrawText3D(pedCoords.x, pedCoords.y, pedCoords.z + 0.5, bubble.text, bubble.color)
+            if dist <= range then
+                local onScreen, screenX, screenY = World3dToScreen2d(pedCoords.x, pedCoords.y, pedCoords.z + 0.4)
+
+                if onScreen then
+                    SendNUIMessage(
+                    {
+                        action = "showChatBubble",
+                        serverId = bubbleId,
+                        text = text,
+                        color = color,
+                        screen =
+                        {
+                            x = screenX,
+                            y = screenY
+                        },
+                        time = duration or 5000
+                    })
                 end
             end
+
+            Wait(0)
+        end
+
+        SendNUIMessage(
+        {
+            action = "removeChatBubble",
+            serverId = bubbleId
+        })
+
+        playerBubbles[bubbleId] = nil
+    end)
+end
+
+-- # Hide Chat Box When In Pause Menu
+CreateThread(function()
+    local wasPaused = false
+
+    while true do
+        Wait(500)
+
+        local paused = IsPauseMenuActive()
+
+        if paused and not wasPaused then
+            SendNUIMessage(
+            {
+                action = 'hideChatMessages'
+            })
+
+            wasPaused = true
+        elseif not paused and wasPaused then
+            SendNUIMessage(
+            {
+                action = 'showChatMessages'
+            })
+
+            wasPaused = false
         end
     end
 end)
-
-function DrawText3D(x, y, z, text, color)
-    local onScreen, _x, _y = World3dToScreen2d(x, y, z)
-    local px, py, pz = table.unpack(GetGameplayCamCoords())
-    local dist = GetDistanceBetweenCoords(px, py, pz, x, y, z, 1)
-    local scale = (1 / dist) * 2
-    local fov = (1 / GetGameplayCamFov()) * 100
-
-    scale = scale * fov
-
-    if onScreen then
-        SetTextScale(0.35 * scale, 0.35 * scale)
-        SetTextFont(10)
-        SetTextProportional(1)
-        SetTextColour(color.r, color.g, color.b, color.a)
-        SetTextCentre(1)
-        SetTextDropshadow(1, 0, 0, 0, 255)
-        SetTextOutline()
-
-        BeginTextCommandDisplayText("STRING")
-
-        AddTextComponentSubstringPlayerName(text)
-
-        EndTextCommandDisplayText(_x, _y)
-    end
-end
 
 --# Hide Player Blip On Map
 CreateThread(function()

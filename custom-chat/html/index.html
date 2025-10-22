@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <title>SA-MP Chat</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+    </style>
 </head>
 <body>
     <div id="chat">
@@ -11,6 +13,15 @@
     </div>
     <input type="text" id="chat-input" placeholder="">
     <div id="chat-suggestions"></div>
+
+    <div id="chat-bubbles"></div>
+
     <script src="script.js"></script>
+    <script>
+        window.addEventListener('message', (event) =>
+        {
+            const data = event.data;
+        });
+    </script>
 </body>
 </html>
