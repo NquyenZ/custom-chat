@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'nquyenZ'
 description 'FiveM Chat'
-version '1.0.2'
+version '1.3'
 
 shared_scripts
 {
@@ -20,7 +20,7 @@ files
     'html/index.html',
     'html/style.css',
     'html/script.js',
-    'html/fonts/RobotoCondensed-Bold.ttf'
+    'html/fonts/lato.semibold.ttf'
 }
 
 client_scripts

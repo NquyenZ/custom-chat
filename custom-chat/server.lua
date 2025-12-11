@@ -174,7 +174,7 @@ end)
 
 RegisterCommand("pmconfig", function(source, args, rawCommand)
     if not QBCore.Functions.HasPermission(source, "admin") then
-        SendClientMessage(source, "{FF6347}[Error]{FFFFFF} Bạn không đủ quyền hạn để sử dụng lệnh này")
+        SendClientMessage(source, "{FFFFFF}Bạn {FF6347}không đủ quyền hạn{FFFFFF} để sử dụng lệnh này")
         return
     end
 

@@ -21,6 +21,12 @@ RegisterCommand('toggleChat', function()
         {
             action = 'enableInput'
         })
+
+        SendNUIMessage(
+        {
+            action = "setMaxCharacters",
+            max = Config.MaxCharacters
+        })
     else
         print("[nquyenZ Chat] Cannot Open Chat Box While In Pause Menu")
     end
@@ -51,7 +57,11 @@ RegisterNUICallback('sendMessage', function(data, cb)
         end
     end
 
-    SendNUIMessage({action='disableInput', clear=true})
+    SendNUIMessage(
+    {
+        action = 'disableInput',
+        clear = true
+    })
 
     cb('ok')
 end)
@@ -63,7 +73,11 @@ RegisterNUICallback('closeInput', function(_, cb)
 
     SetNuiFocus(false, false)
 
-    SendNUIMessage({action='disableInput', clear=true})
+    SendNUIMessage(
+    {
+        action = 'disableInput',
+        clear = true
+    })
 
     cb('ok')
 end)
@@ -73,7 +87,10 @@ RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
 
     SetNuiFocus(false, false)
 
-    SendNUIMessage({action='disableInput'})
+    SendNUIMessage(
+    {
+        action= 'disableInput'
+    })
 end)
 
 RegisterNUICallback('getSuggestions', function(data, cb)
@@ -234,31 +251,32 @@ CreateThread(function()
     end
 end)
 
---# Hide Player Blip On Map
-CreateThread(function()
-    while true do
-        Wait(1000)
+--# Change Vehicle Liveries
+RegisterCommand('livery', function(source, args)
+    local ped = PlayerPedId()
+    local veh = GetVehiclePedIsIn(ped, false)
 
-        for _, id in ipairs(GetActivePlayers()) do
-            local ped = GetPlayerPed(id)
-
-            if ped ~= PlayerPedId() then
-                local blip = GetBlipFromEntity(ped)
-                
-                if blip ~= 0 then
-                    RemoveBlip(blip)
-                end
-            end
-        end
+    if veh == 0 then
+        SendClientMessage("{FFFFFF}Bạn {FF6347}không ở trên phương tiện{FFFFFF} để có thể sử dụng lệnh này")
+        return
     end
-end)
 
---# Disable Autoaim
-CreateThread(function()
-    while true do
-        Wait(0)
+    local totalLiveries = GetVehicleLiveryCount(veh)
 
-        SetPlayerLockon(PlayerId(), false)
-        SetPlayerTargetingMode(0)
+    if totalLiveries == -1 or totalLiveries == 0 then
+        SendClientMessage("{FFFFFF}Phương tiện này {FF6347}không có Livery")
+        return
     end
+
+    local liveryIndex = tonumber(args[1])
+
+    if not liveryIndex then
+        liveryIndex = 0
+    end
+
+    if liveryIndex < 0 or liveryIndex >= totalLiveries then
+        return
+    end
+
+    SetVehicleLivery(veh, liveryIndex)
 end)

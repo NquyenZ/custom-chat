@@ -2,9 +2,11 @@ let chatInput = document.getElementById('chat-input');
 let chatMessages = document.getElementById('chat-messages');
 let chatSuggestions = document.getElementById('chat-suggestions');
 let chatBubbles = document.getElementById("chat-bubbles");
+let charCounter = document.getElementById("char-counter");
 
 let commandHistory = [];
 let historyIndex = 0;
+let maxCharacters = 250;
 
 function addMessageToChat(msg)
 {
@@ -48,6 +50,9 @@ window.addEventListener('message', (event) =>
 
         chatInput.style.display = 'block';
         chatInput.focus();
+
+        charCounter.style.display = "block";
+        charCounter.textContent = `0 / ${maxCharacters}`;
     }
 
     if(data.action === 'disableInput')
@@ -55,6 +60,7 @@ window.addEventListener('message', (event) =>
         closeChat()
 
         chatInput.style.display = 'none';
+        charCounter.style.display = "none";
 
         if(data.clear)
         {
@@ -210,10 +216,29 @@ window.addEventListener('message', (event) =>
     {
         document.getElementById('chat-messages').style.display = "flex";
     }
+
+    if(data.action === "setMaxCharacters")
+    {
+        maxCharacters = data.max || 250;
+        charCounter.textContent = `0 / ${maxCharacters}`;
+    }
 });
 
 chatInput.addEventListener('keydown', (e) =>
 {
+    setTimeout(() =>
+    {
+        let length = chatInput.value.length;
+
+        if(length > maxCharacters)
+        {
+            chatInput.value = chatInput.value.slice(0, maxCharacters);
+            length = maxCharacters;
+        }
+
+        charCounter.textContent = `${length} / ${maxCharacters}`;
+    }, 0);
+    
     if(e.key === 'Enter')
     {
         if(chatInput.value.length > 0)
@@ -226,13 +251,22 @@ chatInput.addEventListener('keydown', (e) =>
         fetch(`https://${GetParentResourceName()}/sendMessage`,
         {
             method:'POST',
-            body: JSON.stringify({ message: chatInput.value }),
-            headers:{ 'Content-Type':'application/json' }
+            body: JSON.stringify(
+            {
+                message: chatInput.value
+            }),
+            headers:
+            {
+                'Content-Type':'application/json'
+            }
         });
     }
     else if(e.key === 'Escape')
     {
-        fetch(`https://${GetParentResourceName()}/closeInput`, { method:'POST' });
+        fetch(`https://${GetParentResourceName()}/closeInput`,
+        {
+            method:'POST'
+        });
     }
     else if(e.key === 'ArrowUp')
     {
@@ -270,8 +304,14 @@ chatInput.addEventListener('keydown', (e) =>
             fetch(`https://${GetParentResourceName()}/getSuggestions`,
             {
                 method:'POST',
-                body: JSON.stringify({ input: chatInput.value.slice(1) }),
-                headers:{ 'Content-Type':'application/json' }
+                body: JSON.stringify(
+                {
+                    input: chatInput.value.slice(1)
+                }),
+                headers:
+                {
+                    'Content-Type':'application/json'
+                }
             });
         }
         else
