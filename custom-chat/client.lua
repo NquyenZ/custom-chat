@@ -27,8 +27,6 @@ RegisterCommand('toggleChat', function()
             action = "setMaxCharacters",
             max = Config.MaxCharacters
         })
-    else
-        print("[nquyenZ Chat] Cannot Open Chat Box While In Pause Menu")
     end
 end)
 

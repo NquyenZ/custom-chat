@@ -19,8 +19,7 @@ files
 {
     'html/index.html',
     'html/style.css',
-    'html/script.js',
-    'html/fonts/lato.semibold.ttf'
+    'html/script.js'
 }
 
 client_scripts
